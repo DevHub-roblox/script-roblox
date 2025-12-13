@@ -1,0 +1,83 @@
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+local Root
+
+local function UpdateRoot()
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    Root = char:WaitForChild("HumanoidRootPart")
+end
+UpdateRoot()
+plr.CharacterAdded:Connect(UpdateRoot)
+
+local Attack = {}
+
+Attack.Pos = function(model, dist)
+    return model
+        and model:FindFirstChild("HumanoidRootPart")
+        and (Root.Position - model.HumanoidRootPart.Position).Magnitude <= dist
+end
+
+function GetNearestEnemy(maxDist)
+    local nearest, shortest = nil, maxDist or math.huge
+    for _, v in pairs(workspace.Enemies:GetChildren()) do
+        if v:FindFirstChild("Humanoid")
+        and v:FindFirstChild("HumanoidRootPart")
+        and v.Humanoid.Health > 0 then
+            local dist = (Root.Position - v.HumanoidRootPart.Position).Magnitude
+            if dist < shortest then
+                shortest = dist
+                nearest = v
+            end
+        end
+    end
+    return nearest
+end
+
+function BringEnemy()
+    if not PosMon then return end
+    for _, v in pairs(workspace.Enemies:GetChildren()) do
+        if v:FindFirstChild("HumanoidRootPart")
+        and v:FindFirstChild("Humanoid")
+        and v.Humanoid.Health > 0 then
+            if (v.HumanoidRootPart.Position - PosMon).Magnitude <= 300 then
+                v.HumanoidRootPart.CFrame = CFrame.new(PosMon)
+                v.HumanoidRootPart.CanCollide = false
+                v.Humanoid.WalkSpeed = 0
+                v.Humanoid.JumpPower = 0
+                if v.Humanoid:FindFirstChild("Animator") then
+                    v.Humanoid.Animator:Destroy()
+                end
+            end
+        end
+    end
+end
+
+function _tp(cf)
+    if not Root then return end
+    Root.CFrame = cf
+end
+
+Attack.Kill = function(model)
+    if not model
+    or not model:FindFirstChild("Humanoid")
+    or model.Humanoid.Health <= 0 then
+        return
+    end
+
+    PosMon = model.HumanoidRootPart.Position
+    BringEnemy()
+    _tp(model.HumanoidRootPart.CFrame * CFrame.new(0, 25, 0))
+end
+
+_G.AutoFarmNear = true
+
+task.spawn(function()
+    while task.wait(0.1) do
+        if _G.AutoFarmNear then
+            local mob = GetNearestEnemy(350)
+            if mob then
+                Attack.Kill(mob)
+            end
+        end
+    end
+end)
