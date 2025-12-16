@@ -1,0 +1,98 @@
+-- Auto Click M1 + Anti AFK + FPS UI
+getgenv().AutoClick = false
+
+-- Services
+local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+-- Anti AFK
+player.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    task.wait(1)
+    VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+
+-- Auto Click Loop
+task.spawn(function()
+    while true do
+        if getgenv().AutoClick then
+            pcall(function()
+                VirtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+                VirtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            end)
+        end
+        task.wait(0.03)
+    end
+end)
+
+-- ===== UI =====
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "AutoClickUI"
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.fromScale(0.3, 0.25)
+Frame.Position = UDim2.fromScale(0.35, 0.38)
+Frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+Frame.Active = true
+Frame.Draggable = true
+Frame.BorderSizePixel = 0
+
+Instance.new("UICorner", Frame).CornerRadius = UDim.new(0,12)
+
+-- Title
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.fromScale(1,0.25)
+Title.BackgroundTransparency = 1
+Title.Text = "Auto Click M1 + Anti AFK"
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+
+-- FPS Label
+local FPSLabel = Instance.new("TextLabel", Frame)
+FPSLabel.Size = UDim2.fromScale(1,0.2)
+FPSLabel.Position = UDim2.fromScale(0,0.25)
+FPSLabel.BackgroundTransparency = 1
+FPSLabel.Text = "FPS: 0"
+FPSLabel.TextColor3 = Color3.fromRGB(0,255,0) -- xanh lá
+FPSLabel.Font = Enum.Font.GothamBold
+FPSLabel.TextScaled = true
+
+-- Toggle Button
+local Toggle = Instance.new("TextButton", Frame)
+Toggle.Size = UDim2.fromScale(0.8,0.3)
+Toggle.Position = UDim2.fromScale(0.1,0.6)
+Toggle.Text = "OFF"
+Toggle.Font = Enum.Font.GothamBold
+Toggle.TextScaled = true
+Toggle.BackgroundColor3 = Color3.fromRGB(170,0,0)
+Toggle.TextColor3 = Color3.new(1,1,1)
+Toggle.BorderSizePixel = 0
+
+Instance.new("UICorner", Toggle).CornerRadius = UDim.new(0,10)
+
+Toggle.MouseButton1Click:Connect(function()
+    getgenv().AutoClick = not getgenv().AutoClick
+    if getgenv().AutoClick then
+        Toggle.Text = "ON"
+        Toggle.BackgroundColor3 = Color3.fromRGB(0,170,0)
+    else
+        Toggle.Text = "OFF"
+        Toggle.BackgroundColor3 = Color3.fromRGB(170,0,0)
+    end
+end)
+
+-- FPS Update
+local frames = 0
+local lastTime = tick()
+
+RunService.RenderStepped:Connect(function()
+    frames += 1
+    if tick() - lastTime >= 1 then
+        FPSLabel.Text = "FPS: " .. frames
+        frames = 0
+        lastTime = tick()
+    end
+end)
