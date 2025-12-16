@@ -1,10 +1,10 @@
---// ThaiHub / TestHub - Strong Aim + FOV (Gunfight Arena)
+--// ThaiHub / Strong Aim + Center FOV (Gunfight Arena)
 
 getgenv().ThaiHubAim = {
     Enabled = false,
-    Radius = 200,       -- FOV size
-    MaxDistance = 500,
-    Smoothness = 1,     -- 1 = lock cứng
+    Radius = 150,        -- FOV (pixel)
+    MaxDistance = 400,   -- khoảng cách 3D
+    Smoothness = 0.15,   -- <1 = mượt | 1 = lock cứng
     AimPart = "Head",
     ShowFOV = true
 }
@@ -12,18 +12,17 @@ getgenv().ThaiHubAim = {
 --// Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
---// UI Button (Drag)
+--// UI
 local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "ThaiHub_TestHub"
+gui.Name = "ThaiHub_Aim"
 gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0,150,0,45)
-frame.Position = UDim2.new(0.5,-75,0.8,0)
+frame.Size = UDim2.new(0,160,0,45)
+frame.Position = UDim2.new(0.5,-80,0.8,0)
 frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
 frame.Active = true
 frame.Draggable = true
@@ -43,29 +42,36 @@ btn.MouseButton1Click:Connect(function()
     btn.Text = ThaiHubAim.Enabled and "🎯 ThaiHub AIM : ON" or "🎯 ThaiHub AIM : OFF"
 end)
 
---// FOV Circle
+--// FOV Circle (Center Screen)
 local fov = Drawing.new("Circle")
 fov.Color = Color3.fromRGB(255, 0, 0)
 fov.Thickness = 2
-fov.Filled = false
 fov.NumSides = 100
+fov.Filled = false
 fov.Visible = false
 
---// Target Lock
-local LockedTarget = nil
+--// Get Screen Center
+local function GetScreenCenter()
+    local v = Camera.ViewportSize
+    return Vector2.new(v.X / 2, v.Y / 2)
+end
 
+--// Get Target (liên tục)
 local function GetTarget()
-    local closest, shortest = nil, ThaiHubAim.Radius
+    local closest = nil
+    local shortest = ThaiHubAim.Radius
+    local screenCenter = GetScreenCenter()
 
     for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild(ThaiHubAim.AimPart) then
-            local hum = plr.Character:FindFirstChildOfClass("Humanoid")
-            if hum and hum.Health > 0 then
-                local part = plr.Character[ThaiHubAim.AimPart]
-                local pos, vis = Camera:WorldToViewportPoint(part.Position)
-                if vis then
-                    local mousePos = UIS:GetMouseLocation()
-                    local dist2D = (Vector2.new(pos.X,pos.Y) - mousePos).Magnitude
+        if plr ~= LocalPlayer and plr.Character then
+            local char = plr.Character
+            local part = char:FindFirstChild(ThaiHubAim.AimPart)
+            local hum = char:FindFirstChildOfClass("Humanoid")
+
+            if part and hum and hum.Health > 0 then
+                local pos, visible = Camera:WorldToViewportPoint(part.Position)
+                if visible then
+                    local dist2D = (Vector2.new(pos.X, pos.Y) - screenCenter).Magnitude
                     local dist3D = (part.Position - Camera.CFrame.Position).Magnitude
 
                     if dist2D < shortest and dist3D <= ThaiHubAim.MaxDistance then
@@ -76,36 +82,27 @@ local function GetTarget()
             end
         end
     end
+
     return closest
 end
 
---// Loop
+--// Aim Loop (Aim liên tục)
 RunService.RenderStepped:Connect(function()
-    local mousePos = UIS:GetMouseLocation()
+    local screenCenter = GetScreenCenter()
 
     -- FOV update
-    fov.Position = mousePos
+    fov.Position = screenCenter
     fov.Radius = ThaiHubAim.Radius
     fov.Visible = ThaiHubAim.Enabled and ThaiHubAim.ShowFOV
 
     if not ThaiHubAim.Enabled then
-        LockedTarget = nil
         return
     end
 
-    if not LockedTarget or not LockedTarget.Parent then
-        LockedTarget = GetTarget()
-    end
-
-    if LockedTarget then
-        local hum = LockedTarget.Parent:FindFirstChildOfClass("Humanoid")
-        if not hum or hum.Health <= 0 then
-            LockedTarget = nil
-            return
-        end
-
+    local target = GetTarget()
+    if target then
         local camPos = Camera.CFrame.Position
-        local targetPos = LockedTarget.Position
+        local targetPos = target.Position
         local newCF = CFrame.new(camPos, targetPos)
 
         if ThaiHubAim.Smoothness >= 1 then
