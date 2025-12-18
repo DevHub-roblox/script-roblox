@@ -48,20 +48,17 @@ if v16 then
     require(v16):Stop()
 end
 local v17 = game.PlaceId
-if ({
-    [2753915549] = true,
-    [4442272183] = true,
-    [7449423635] = true
-})[v17] then
-    if v17 == 2753915549 then
-        World1 = true
-    elseif v17 == 4442272183 then
-        World2 = true
-    elseif v17 == 7449423635 then
-        World3 = true
-    end
-else
-    game.Players.LocalPlayer:Kick("Unsupported Game")
+
+World1 = false
+World2 = false
+World3 = false
+
+if v17 == 2753915549 then
+    World1 = true
+elseif v17 == 4442272183 then
+    World2 = true
+elseif v17 == 7449423635 then
+    World3 = true
 end
 repeat
     wait()
