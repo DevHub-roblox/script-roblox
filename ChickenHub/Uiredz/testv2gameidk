@@ -1525,12 +1525,12 @@ function AttackNoCoolDown()
 end
 print("--[[Loaded UI]]--")
 Window = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))():CreateWindow({
-    ["Title"] = "Banana Cat Hub [ Free ] By Chiriku Roblox",
-    ["SubTitle"] = "",
+    ["Title"] = "Banana Cat Hub [ Free ] ChickenHub",
+    ["SubTitle"] = "nahgame",
     ["TabWidth"] = 155,
     ["Size"] = UDim2.fromOffset(500, 350),
     ["Acrylic"] = false,
-    ["Theme"] = "Dark",
+    ["Theme"] = "Yellow",
     ["MinimizeKey"] = Enum.KeyCode.LeftControl
 })
 Shop = Window:AddTab({
