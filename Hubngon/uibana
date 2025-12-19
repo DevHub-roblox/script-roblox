@@ -1,0 +1,125 @@
+pcall(function()
+	if getgenv().BananaMobile then return end
+	getgenv().BananaMobile = true
+
+	local player = game.Players.LocalPlayer
+
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "BananaHub"
+	gui.ResetOnSpawn = false
+	gui.IgnoreGuiInset = true
+	gui.Parent = player.PlayerGui
+
+	local Main = Instance.new("Frame", gui)
+	Main.Size = UDim2.new(0,380,0,300)
+	Main.Position = UDim2.new(0.5,-190,0.5,-150)
+	Main.BackgroundColor3 = Color3.fromRGB(28,28,28)
+	Main.Active = true
+	Instance.new("UICorner", Main).CornerRadius = UDim.new(0,18)
+
+	local Top = Instance.new("Frame", Main)
+	Top.Size = UDim2.new(1,0,0,42)
+	Top.BackgroundColor3 = Color3.fromRGB(35,35,35)
+	Instance.new("UICorner", Top).CornerRadius = UDim.new(0,18)
+
+	local Title = Instance.new("TextLabel", Top)
+	Title.Size = UDim2.new(1,-60,1,0)
+	Title.Position = UDim2.new(0,12,0,0)
+	Title.Text = "🍌 Banana Hub"
+	Title.TextColor3 = Color3.new(1,1,1)
+	Title.Font = Enum.Font.GothamBold
+	Title.TextSize = 18
+	Title.BackgroundTransparency = 1
+	Title.TextXAlignment = Left
+
+	local Close = Instance.new("TextButton", Top)
+	Close.Size = UDim2.new(0,36,0,36)
+	Close.Position = UDim2.new(1,-40,0,3)
+	Close.Text = "✕"
+	Close.TextColor3 = Color3.new(1,1,1)
+	Close.Font = Enum.Font.GothamBold
+	Close.TextSize = 20
+	Close.BackgroundColor3 = Color3.fromRGB(50,50,50)
+	Instance.new("UICorner", Close).CornerRadius = UDim.new(1,0)
+
+	local Tabs = Instance.new("Frame", Main)
+	Tabs.Size = UDim2.new(1,-20,0,40)
+	Tabs.Position = UDim2.new(0,10,0,50)
+	Tabs.BackgroundTransparency = 1
+
+	local Tab1 = Instance.new("TextButton", Tabs)
+	Tab1.Size = UDim2.new(0.5,-5,1,0)
+	Tab1.Text = "Test 1"
+	Tab1.Font = Enum.Font.GothamBold
+	Tab1.TextSize = 14
+	Tab1.TextColor3 = Color3.new(1,1,1)
+	Tab1.BackgroundColor3 = Color3.fromRGB(55,55,55)
+	Instance.new("UICorner", Tab1).CornerRadius = UDim.new(0,14)
+
+	local Tab2 = Instance.new("TextButton", Tabs)
+	Tab2.Size = UDim2.new(0.5,-5,1,0)
+	Tab2.Position = UDim2.new(0.5,5,0,0)
+	Tab2.Text = "Test 2"
+	Tab2.Font = Enum.Font.GothamBold
+	Tab2.TextSize = 14
+	Tab2.TextColor3 = Color3.new(1,1,1)
+	Tab2.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	Instance.new("UICorner", Tab2).CornerRadius = UDim.new(0,14)
+
+	local Page1 = Instance.new("Frame", Main)
+	Page1.Size = UDim2.new(1,-20,1,-110)
+	Page1.Position = UDim2.new(0,10,0,100)
+	Page1.BackgroundTransparency = 1
+
+	local Page2 = Instance.new("Frame", Main)
+	Page2.Size = Page1.Size
+	Page2.Position = Page1.Position
+	Page2.BackgroundTransparency = 1
+	Page2.Visible = false
+
+	local Btn1 = Instance.new("TextButton", Page1)
+	Btn1.Size = UDim2.new(1,0,0,44)
+	Btn1.Text = "Button Test 1"
+	Btn1.Font = Enum.Font.GothamMedium
+	Btn1.TextSize = 16
+	Btn1.TextColor3 = Color3.new(1,1,1)
+	Btn1.BackgroundColor3 = Color3.fromRGB(45,45,45)
+	Instance.new("UICorner", Btn1).CornerRadius = UDim.new(0,14)
+
+	local Btn2 = Instance.new("TextButton", Page2)
+	Btn2.Size = Btn1.Size
+	Btn2.Text = "Button Test 2"
+	Btn2.Font = Enum.Font.GothamMedium
+	Btn2.TextSize = 16
+	Btn2.TextColor3 = Color3.new(1,1,1)
+	Btn2.BackgroundColor3 = Color3.fromRGB(45,45,45)
+	Instance.new("UICorner", Btn2).CornerRadius = UDim.new(0,14)
+
+	Tab1.MouseButton1Click:Connect(function()
+		Page1.Visible = true
+		Page2.Visible = false
+		Tab1.BackgroundColor3 = Color3.fromRGB(55,55,55)
+		Tab2.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	end)
+
+	Tab2.MouseButton1Click:Connect(function()
+		Page1.Visible = false
+		Page2.Visible = true
+		Tab2.BackgroundColor3 = Color3.fromRGB(55,55,55)
+		Tab1.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	end)
+
+	Close.MouseButton1Click:Connect(function()
+		Main.Visible = false
+	end)
+
+	local Toggle = Instance.new("ImageButton", gui)
+	Toggle.Size = UDim2.new(0,56,0,56)
+	Toggle.Position = UDim2.new(0,12,0.5,-28)
+	Toggle.BackgroundTransparency = 1
+	Toggle.Image = "rbxassetid://7072718367"
+
+	Toggle.MouseButton1Click:Connect(function()
+		Main.Visible = not Main.Visible
+	end)
+end)
