@@ -1974,7 +1974,7 @@ end
 local Library = loadstring(game:HttpGet("https://pastefy.app/28c5ZUsm/raw"))()
 
 local Window = Library:MakeWindow({
-  Title = "ThaiHub : Blox Fruits",
+  Title = "ChickenHub : Blox Fruits",
   SubTitle = "by LuongThai",
   ScriptFolder = "RedzLibraryBF"
 })
