@@ -4,13 +4,11 @@ getgenv().BananaHubLoaded = true
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
 local Player = Players.LocalPlayer
 
-local gui = Instance.new("ScreenGui")
+local gui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
 gui.Name = "BananaHub"
 gui.ResetOnSpawn = false
-gui.Parent = Player:WaitForChild("PlayerGui")
 
 local Main = Instance.new("Frame", gui)
 Main.Size = UDim2.fromScale(0,0)
@@ -23,7 +21,7 @@ Instance.new("UICorner", Main).CornerRadius = UDim.new(0,22)
 
 local grad = Instance.new("UIGradient", Main)
 grad.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255,225,130)),
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255,220,120)),
 	ColorSequenceKeypoint.new(1, Color3.fromRGB(255,170,0))
 }
 grad.Rotation = 25
@@ -54,31 +52,63 @@ Close.MouseButton1Click:Connect(function()
 	Main.Visible = false
 end)
 
-local TabButtons = Instance.new("Frame", Main)
-TabButtons.Size = UDim2.new(1,-20,0,36)
-TabButtons.Position = UDim2.new(0,10,0,48)
-TabButtons.BackgroundTransparency = 1
+local TabBar = Instance.new("Frame", Main)
+TabBar.Size = UDim2.new(1,-20,0,36)
+TabBar.Position = UDim2.new(0,10,0,48)
+TabBar.BackgroundTransparency = 1
 
-local tabLayout = Instance.new("UIListLayout", TabButtons)
-tabLayout.FillDirection = Horizontal
+local tabLayout = Instance.new("UIListLayout", TabBar)
+tabLayout.FillDirection = Enum.FillDirection.Horizontal
 tabLayout.Padding = UDim.new(0,8)
 
 local Pages = {}
 
-local function CreatePage(name)
-	local page = Instance.new("Frame", Main)
-	page.Name = name
-	page.Size = UDim2.new(1,-20,1,-100)
-	page.Position = UDim2.new(0,10,0,90)
-	page.BackgroundTransparency = 1
-	page.Visible = false
-	local l = Instance.new("UIListLayout", page)
+local function NewPage(name)
+	local p = Instance.new("Frame", Main)
+	p.Size = UDim2.new(1,-20,1,-100)
+	p.Position = UDim2.new(0,10,0,90)
+	p.BackgroundTransparency = 1
+	p.Visible = false
+	local l = Instance.new("UIListLayout", p)
 	l.Padding = UDim.new(0,10)
-	Pages[name] = page
-	return page
+	Pages[name] = p
+	return p
 end
 
-local function CreateButton(parent,text,callback)
+local function SwitchTab(name)
+	for _,v in pairs(Pages) do
+		v.Visible = false
+	end
+	if Pages[name] then
+		Pages[name].Visible = true
+	end
+end
+
+local function NewTab(name)
+	local b = Instance.new("TextButton", TabBar)
+	b.Size = UDim2.new(0,120,1,0)
+	b.Text = name
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 14
+	b.TextColor3 = Color3.new(1,1,1)
+	b.BackgroundColor3 = Color3.fromRGB(30,30,30)
+	b.BackgroundTransparency = 0.3
+	b.AutoButtonColor = false
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0,14)
+	b.MouseButton1Click:Connect(function()
+		SwitchTab(name)
+	end)
+end
+
+local Test1 = NewPage("Test 1")
+local Test2 = NewPage("Test 2")
+
+NewTab("Test 1")
+NewTab("Test 2")
+
+SwitchTab("Test 1")
+
+local function Button(parent,text)
 	local b = Instance.new("TextButton", parent)
 	b.Size = UDim2.new(1,0,0,46)
 	b.Text = text
@@ -95,84 +125,28 @@ local function CreateButton(parent,text,callback)
 		ColorSequenceKeypoint.new(1, Color3.fromRGB(255,180,0))
 	}
 	g.Rotation = 90
-	b.MouseButton1Click:Connect(function()
-		TweenService:Create(b,TweenInfo.new(0.15),{BackgroundTransparency=0.35}):Play()
-		task.delay(0.15,function() b.BackgroundTransparency=0.2 end)
-		if callback then callback() end
-	end)
 end
 
-local function CreateTab(name)
-	local t = Instance.new("TextButton", TabButtons)
-	t.Size = UDim2.new(0,110,1,0)
-	t.Text = name
-	t.Font = Enum.Font.GothamBold
-	t.TextSize = 14
-	t.TextColor3 = Color3.new(1,1,1)
-	t.BackgroundColor3 = Color3.fromRGB(30,30,30)
-	t.BackgroundTransparency = 0.3
-	t.AutoButtonColor = false
-	Instance.new("UICorner", t).CornerRadius = UDim.new(0,14)
-	t.MouseButton1Click:Connect(function()
-		for _,p in pairs(Pages) do p.Visible = false end
-		Pages[name].Visible = true
-	end)
-end
+Button(Test1,"Button Test 1")
+Button(Test1,"Button Test 1.2")
+Button(Test2,"Button Test 2")
+Button(Test2,"Button Test 2.2")
 
-local MainTab = CreatePage("Main")
-local VisualTab = CreatePage("Visual")
-local MiscTab = CreatePage("Misc")
-
-CreateTab("Main")
-CreateTab("Visual")
-CreateTab("Misc")
-MainTab.Visible = true
-
-CreateButton(MainTab,"⚡ FPS Boost",function()
-	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-end)
-
-CreateButton(VisualTab,"🌕 Full Bright",function()
-	Lighting.Brightness = 3
-	Lighting.ClockTime = 14
-	Lighting.FogEnd = 1e9
-end)
-
-CreateButton(VisualTab,"👁 ESP Name",function()
-	for _,p in pairs(Players:GetPlayers()) do
-		if p~=Player and p.Character and p.Character:FindFirstChild("Head") then
-			local bb = Instance.new("BillboardGui",p.Character.Head)
-			bb.Size = UDim2.new(0,120,0,30)
-			bb.AlwaysOnTop = true
-			local t = Instance.new("TextLabel",bb)
-			t.Size = UDim2.new(1,0,1,0)
-			t.Text = p.Name
-			t.BackgroundTransparency = 1
-			t.TextColor3 = Color3.new(1,1,1)
-			t.TextStrokeTransparency = 0
-		end
-	end
-end)
-
-CreateButton(MiscTab,"🔄 Rejoin",function()
-	game:GetService("TeleportService"):Teleport(game.PlaceId,Player)
-end)
-
-TweenService:Create(Main,TweenInfo.new(0.4,Enum.EasingStyle.Quint),{
-	Size = UDim2.fromScale(0.48,0.55)
+TweenService:Create(Main,TweenInfo.new(0.35,Enum.EasingStyle.Quint),{
+	Size = UDim2.fromScale(0.45,0.5)
 }):Play()
 
-local dragging,startPos,startInput
+local drag,startPos,startInput
 Main.InputBegan:Connect(function(i)
 	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-		dragging=true
+		drag=true
 		startInput=i.Position
 		startPos=Main.Position
 	end
 end)
 
 UIS.InputChanged:Connect(function(i)
-	if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+	if drag and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
 		local d=i.Position-startInput
 		Main.Position=UDim2.new(startPos.X.Scale,startPos.X.Offset+d.X,startPos.Y.Scale,startPos.Y.Offset+d.Y)
 	end
@@ -180,40 +154,40 @@ end)
 
 UIS.InputEnded:Connect(function(i)
 	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-		dragging=false
+		drag=false
 	end
 end)
 
-local ToggleBtn = Instance.new("ImageButton", gui)
-ToggleBtn.Size = UDim2.fromOffset(58,58)
-ToggleBtn.Position = UDim2.fromScale(0.05,0.5)
-ToggleBtn.BackgroundTransparency = 1
-ToggleBtn.Image = "rbxassetid://7072718367"
-ToggleBtn.ZIndex = 10
-Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(1,0)
+local Toggle = Instance.new("ImageButton", gui)
+Toggle.Size = UDim2.fromOffset(56,56)
+Toggle.Position = UDim2.fromScale(0.05,0.5)
+Toggle.BackgroundTransparency = 1
+Toggle.Image = "rbxassetid://7072718367"
+Toggle.ZIndex = 20
+Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1,0)
 
-ToggleBtn.MouseButton1Click:Connect(function()
+Toggle.MouseButton1Click:Connect(function()
 	Main.Visible = not Main.Visible
 end)
 
-local draggingBtn,btnStart,btnPos
-ToggleBtn.InputBegan:Connect(function(i)
+local d2,s2,p2
+Toggle.InputBegan:Connect(function(i)
 	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-		draggingBtn=true
-		btnStart=i.Position
-		btnPos=ToggleBtn.Position
+		d2=true
+		s2=i.Position
+		p2=Toggle.Position
 	end
 end)
 
 UIS.InputChanged:Connect(function(i)
-	if draggingBtn and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
-		local d=i.Position-btnStart
-		ToggleBtn.Position=UDim2.new(btnPos.X.Scale,btnPos.X.Offset+d.X,btnPos.Y.Scale,btnPos.Y.Offset+d.Y)
+	if d2 and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+		local d=i.Position-s2
+		Toggle.Position=UDim2.new(p2.X.Scale,p2.X.Offset+d.X,p2.Y.Scale,p2.Y.Offset+d.Y)
 	end
 end)
 
 UIS.InputEnded:Connect(function(i)
 	if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-		draggingBtn=false
+		d2=false
 	end
 end)
