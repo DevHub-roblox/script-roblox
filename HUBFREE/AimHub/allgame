@@ -1,0 +1,129 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+-- CẤU HÌNH RIÊNG BIỆT
+_G.AimbotEnabled = false -- Mặc định vào là tắt Aimbot để an toàn
+_G.TracersAlwaysOn = true -- Đường kẻ luôn luôn bật
+_G.TeamCheck = true
+_G.AimPart = "Head"
+_G.Sensitivity = 0.8
+_G.FOV_Size = 150
+
+-- 1. KHỞI TẠO VÒNG TRÒN FOV
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Visible = false -- Chỉ hiện khi bật Aimbot
+FOVCircle.Thickness = 1.5
+FOVCircle.Color = Color3.fromRGB(255, 255, 255)
+FOVCircle.Radius = _G.FOV_Size
+FOVCircle.Filled = false
+
+-- 2. QUẢN LÝ ĐƯỜNG KẺ (TRACERS)
+local Tracers = {}
+
+local function CreateTracer(player)
+    if player == LocalPlayer then return end
+    local line = Drawing.new("Line")
+    line.Visible = false
+    line.Color = Color3.fromRGB(255, 0, 0) -- Màu đỏ cho đối thủ
+    line.Thickness = 1
+    line.Transparency = 0.6
+    Tracers[player] = line
+end
+
+-- Đăng ký người chơi
+for _, p in pairs(Players:GetPlayers()) do CreateTracer(p) end
+Players.PlayerAdded:Connect(CreateTracer)
+Players.PlayerRemoving:Connect(function(p)
+    if Tracers[p] then Tracers[p]:Remove() Tracers[p] = nil end
+end)
+
+-- 3. GIAO DIỆN NÚT BẤM (CHỈ CHO AIMBOT)
+local ScreenGui = Instance.new("ScreenGui")
+local ToggleButton = Instance.new("TextButton")
+local UICorner = Instance.new("UICorner")
+
+ScreenGui.Parent = game.CoreGui
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.Position = UDim2.new(0.05, 0, 0.4, 0)
+ToggleButton.Size = UDim2.new(0, 100, 0, 45)
+ToggleButton.Text = "AIM: OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextSize = 18
+ToggleButton.Draggable = true
+UICorner.Parent = ToggleButton
+
+ToggleButton.MouseButton1Click:Connect(function()
+    _G.AimbotEnabled = not _G.AimbotEnabled
+    if _G.AimbotEnabled then
+        ToggleButton.Text = "AIM: ON"
+        ToggleButton.TextColor3 = Color3.fromRGB(0, 255, 150)
+        FOVCircle.Visible = true
+    else
+        ToggleButton.Text = "AIM: OFF"
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+        FOVCircle.Visible = false
+    end
+end)
+
+-- 4. HÀM TÌM MỤC TIÊU CHO AIMBOT
+local function GetClosestEnemy()
+    local ClosestDistance = _G.FOV_Size
+    local Target = nil
+    local Center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild(_G.AimPart) and v.Character.Humanoid.Health > 0 then
+            if _G.TeamCheck and v.Team == LocalPlayer.Team then continue end
+            local ScreenPoint, OnScreen = Camera:WorldToScreenPoint(v.Character[_G.AimPart].Position)
+            local Distance = (Vector2.new(ScreenPoint.X, ScreenPoint.Y) - Center).Magnitude
+            if Distance < ClosestDistance and OnScreen then
+                ClosestDistance = Distance
+                Target = v
+            end
+        end
+    end
+    return Target
+end
+
+-- 5. VÒNG LẶP CHÍNH (XỬ LÝ RIÊNG BIỆT)
+RunService.RenderStepped:Connect(function()
+    local Center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local BottomScreen = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+    
+    -- Cập nhật FOV
+    FOVCircle.Position = Center
+
+    -- Aimbot (Chỉ chạy khi bật nút)
+    if _G.AimbotEnabled then
+        local Target = GetClosestEnemy()
+        if Target then
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, Target.Character[_G.AimPart].Position), _G.Sensitivity)
+        end
+    end
+
+    -- Tracers (Luôn luôn chạy, tách biệt hoàn toàn)
+    for player, line in pairs(Tracers) do
+        if _G.TracersAlwaysOn and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character.Humanoid.Health > 0 then
+            -- Team Check cho đường kẻ
+            if _G.TeamCheck and player.Team == LocalPlayer.Team then
+                line.Visible = false
+                continue
+            end
+
+            local Pos, OnScreen = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+            if OnScreen then
+                line.From = BottomScreen
+                line.To = Vector2.new(Pos.X, Pos.Y)
+                line.Visible = true
+            else
+                line.Visible = false
+            end
+        else
+            line.Visible = false
+        end
+    end
+end)
