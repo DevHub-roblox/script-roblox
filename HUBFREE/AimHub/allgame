@@ -1,4 +1,78 @@
-local Players = game:GetService("Players")
+export default {
+  async fetch(req) {
+    const url = new URL(req.url)
+    const ua = (req.headers.get("User-Agent") || "").toLowerCase()
+
+    const fake404 = () => new Response(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>404</title>
+<style>
+body{
+  margin:0;
+  background:#000;
+  color:#f00;
+  font-family:monospace;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+h1{font-size:96px;margin:0}
+p{opacity:.7}
+</style>
+</head>
+<body>
+<div>
+  <h1>TRIEUDZ</h1>
+  <p>TUOI_CAC</p>
+  <p>TUOILON</p>
+</div>
+</body>
+</html>
+`, { status: 404, headers: { "Content-Type": "text/html" }})
+
+    // ===== share by Trieudz =====
+    const EXECUTORS = [
+      "roblox",
+      "delta",
+      "krnl",
+      "arceus",
+      "swift",
+      "awp",
+      "volcano",
+      "argon",
+      "macsploit",
+      "potassium",
+      "codex",
+      "velocity",
+      "ronix",
+      "synapse",
+      "fluxus",
+      "scriptware",
+      "electron",
+      "hydrogen",
+      "evon",
+      "trigon",
+      "comet",
+      "oxygen"
+    ]
+
+    function isExecutorAllowed(ua) {
+      return EXECUTORS.some(name => ua.includes(name))
+    }
+
+    // ===== RAW ROUTE =====
+    if (url.pathname.startsWith("/raw/")) {
+
+      // CHẶN BROWSER / TOOL SOI
+      if (!isExecutorAllowed(ua)) {
+        return fake404()
+      }
+
+      // ===== LUA SOURCE =====
+      return new Response(`local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
@@ -128,3 +202,12 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+
+      `.trim(), {
+        headers: { "Content-Type": "text/plain" }
+      })
+    }
+
+    return fake404()
+  }
+}
