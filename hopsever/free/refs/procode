@@ -3665,8 +3665,8 @@ function CheckItemBPCRBPCR(v463)
     end
 end
 local v466 = loadstring(game:HttpGet("https://pastefy.app/cgRXe9Xh/raw"))():MakeWindow({
-    Title = "NaNa TV Hub",
-    SubTitle = "by NaNa On TOP",
+    Title = "Chicken Hub",
+    SubTitle = "by THAIS",
     SaveFolder = "Redz | redz lib v5.lua"
 })
 local l_ScreenGui_0 = Instance.new("ScreenGui")
