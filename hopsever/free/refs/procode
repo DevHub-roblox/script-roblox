@@ -3675,7 +3675,7 @@ l_ScreenGui_0.Parent = game.CoreGui
 local l_ImageButton_0 = Instance.new("ImageButton")
 l_ImageButton_0.Size = UDim2.new(0, 50, 0, 50)
 l_ImageButton_0.Position = UDim2.new(0.15, 0, 0.15, 0)
-l_ImageButton_0.Image = "rbxassetid:// 100173004454294"
+l_ImageButton_0.Image = "rbxassetid:// 10511856020"
 l_ImageButton_0.BackgroundTransparency = 1
 l_ImageButton_0.Parent = l_ScreenGui_0
 local l_UICorner_0 = Instance.new("UICorner")
@@ -3757,20 +3757,20 @@ local v496 = v466:MakeTab({"Settings","rbxassetid://100173004454294"})
 v484:AddDiscordInvite({
     Name = "Tham Gia Discord",
     Description = "Link Sever Discord",
-    Logo = "rbxassetid://77576958738832",
-    Invite = " https://vt.tiktok.com/ZSfEgfPk4/"
+    Logo = "rbxassetid://111185054556277",
+    Invite = " https://discord.gg/VRrkYWBw"
 })
 v484:AddDiscordInvite({
-    Name = "NaNa-TV-Hub",
-    Description = "YouTube C\225\187\167a B\225\187\145 \196\144\195\162y Nh\195\179c",
-    Logo = "rbxassetid://77576958738832",
-    Invite = "ko share đâu"
+    Name = "Chicken hub",
+    Description = "dis cord https://discord.gg/VRrkYWBw",
+    Logo = "rbxassetid://111185054556277",
+    Invite = "https://discord.gg/VRrkYWBw"
 })
 v484:AddDiscordInvite({
-    Name = "NaNa-TV",
-    Description = "TikTok C\225\187\167a B\225\187\145 \196\144\195\162y Nh\195\179c",
-    Logo = "rbxassetid://77576958738832",
-    Invite = " https://www.tiktok.com/@real_nanatvroblox?_r=1&_t=ZS-92cvg2WM18G"
+    Name = "Chicken on top",
+    Description = "hạ hẹ",
+    Logo = "rbxassetid://111185054556277",
+    Invite = " https://discord.gg/VRrkYWBw"
 })
 local _ = v485:AddSection({"Select Melee,Sword,Gun,Fruit"})
 _G.SelectWeapon = "Melee"
